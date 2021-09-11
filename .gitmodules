@@ -1,0 +1,18 @@
+[submodule "vendor/GLFW"]
+	path = vendor/GLFW
+	url = https://gitee.com/Kpure1000/glfw.git
+[submodule "vendor/glm"]
+	path = vendor/glm
+	url = https://gitee.com/Kpure1000/glm.git
+[submodule "vendor/spdlog"]
+	path = vendor/spdlog
+	url = https://gitee.com/Kpure1000/spdlog.git
+[submodule "vendor/stb"]
+	path = vendor/stb
+	url = https://gitee.com/Kpure1000/stb.git
+[submodule "vendor/imgui"]
+	path = vendor/imgui
+	url = https://gitee.com/Kpure1000/imgui.git
+[submodule "vendor/assimp"]
+	path = vendor/assimp
+	url = https://gitee.com/Kpure1000/assimp.git
