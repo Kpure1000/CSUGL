@@ -14,7 +14,7 @@ namespace csugl {
     Application::Application() : isRunning(false) {
         glm::ivec2 winSize(800, 600);
         window = csugl::MakeScope<csugl::Window>(csugl::Window(
-                csugl::WindowProps("CSUGL Engine", winSize.x, winSize.y, true, true)
+                csugl::WindowProps("CSUGL Engine", winSize.x, winSize.y, true, false)
         ));
         isRunning = true;
         window->addEventCallback([this](csugl::Event &ev) {
