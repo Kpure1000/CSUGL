@@ -1,12 +1,22 @@
 cmake_minimum_required(VERSION 3.8)
 set(PROJECT_NAME CSUGL)
 project(${PROJECT_NAME})
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED FALSE)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    message("Use MSVC")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    message("Use Gnu")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -O3 -Wa,-mbig-obj -std=gnu++17")
+else ()
+    message("Use Other")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -std=c++17")
+    if (NOT WIN32)
+        LIST(APPEND LIBS dl)
+    endif ()
 endif ()
 
 # GLFW
@@ -48,18 +58,10 @@ include_directories(vendor/imgui)
 option(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
 option(ASSIMP_BUILD_SAMPLES OFF)
 option(ASSIMP_BUILD_TESTS OFF)
+OPTION(ASSIMP_BUILD_ZLIB "" ON)
 add_subdirectory(vendor/assimp)
 list(APPEND LIBS assimp)
 include_directories(vendor/assimp/include)
-
-if (MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
-else ()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -std=c++17")
-    if (NOT WIN32)
-        LIST(APPEND LIBS dl)
-    endif ()
-endif ()
 
 # CSUGL
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
