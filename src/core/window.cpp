@@ -144,12 +144,12 @@ namespace csugl {
                             callback(event);
                         break;
                     }
-                    case GLFW_RELEASE: {
+                    case GLFW_RELEASE:
+                    default:
                         MouseButtonReleasedEvent event(button);
                         for (auto &callback : data.eventCallBacks)
                             callback(event);
                         break;
-                    }
                 }
             });
 
@@ -180,11 +180,6 @@ namespace csugl {
         }
 
         SetVSync(m_Data->VSync);
-    }
-
-    void Window::Clear(const glm::vec4 &clearColor) const {
-        glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     void Window::Display() const {

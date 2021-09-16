@@ -20,7 +20,6 @@ namespace csugl {
 
         virtual glm::mat4 get_projection_mat() const = 0;
 
-    protected:
         Transform& transform;
     };
 
@@ -30,7 +29,6 @@ namespace csugl {
 
         glm::mat4 get_projection_mat() const override;
 
-    private:
         glm::vec2 size;
         float _near, _far;
     };
@@ -41,9 +39,6 @@ namespace csugl {
 
         glm::mat4 get_projection_mat() const override;
 
-        void SetFov(float fov) { this->fov = fov; }
-
-    private:
         float fov, aspect, _near, _far;
     };
 

@@ -24,7 +24,7 @@ namespace csugl {
                 return false;
             });
             dispatcher.Dispatch<csugl::WindowResizeEvent>([](csugl::WindowResizeEvent &ev) {
-                glViewport(0, 0, ev.width, ev.height);
+                glViewport(0, 0, (int) ev.width, (int) ev.height);
                 return false;
             });
             dispatcher.Dispatch<csugl::KeyPressedEvent>([this](csugl::KeyPressedEvent &ev) {

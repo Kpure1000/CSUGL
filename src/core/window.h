@@ -76,8 +76,6 @@ namespace csugl {
 
         glm::ivec2 GetScreenSize() const;
 
-        void Clear(const glm::vec4 &clearColor = {0.24f, 0.24f, 0.24f, 1.0f}) const;
-
         void Display() const;
 
         void SetVSync(bool vsync);
