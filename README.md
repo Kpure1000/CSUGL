@@ -5,12 +5,12 @@
 ### 依赖
 
 * OpenGL图形渲染——[GLAD](https://glad.dav1d.de/)
-* 跨平台窗口渲染——[GLFW](https://gitee.com/Kpure1000/glfw.git)
-* 图形学数学运算——[GLM](https://gitee.com/Kpure1000/glm.git)
-* 图片加载——[STB](https://gitee.com/Kpure1000/stb.git)
-* 模型加载——[Assimp](https://gitee.com/Kpure1000/assimp.git)
-* GUI渲染——[ImGUI](https://gitee.com/Kpure1000/imgui.git)
-* 日志输出——[SpdLog](https://gitee.com/Kpure1000/spdlog.git)
+* 跨平台窗口渲染——[GLFW](https://www.glfw.org/)
+* 图形学数学运算——[GLM](https://glm.g-truc.net/0.9.9/index.html)
+* 图片加载——[STB](https://www.stbi.net/)
+* 模型加载——[Assimp](https://github.com/assimp/assimp)
+* GUI渲染——[ImGUI](https://github.com/ocornut/imgui)
+* 日志输出——[glog](https://github.com/google/glog)
 
 ### 特性
 
