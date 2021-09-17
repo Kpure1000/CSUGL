@@ -6,7 +6,6 @@
 #include "core/event.h"
 #include "core/file_system.h"
 #include "core/input.h"
-#include "core/log.h"
 #include "core/transform.h"
 #include "core/window.h"
 

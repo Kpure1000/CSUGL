@@ -16,3 +16,6 @@
 [submodule "vendor/assimp"]
 	path = vendor/assimp
 	url = https://gitee.com/Kpure1000/assimp.git
+[submodule "vendor/glog"]
+	path = vendor/glog
+	url = https://gitee.com/Kpure1000/glog.git

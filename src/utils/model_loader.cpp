@@ -1,9 +1,8 @@
 //
 // Created by ktsq on 2021/8/22.
 //
-
+#include <core/core.h>
 #include "model_loader.h"
-#include "../core/log.h"
 #include "../core/file_system.h"
 #include "asset_manager.h"
 #include "singleton.h"
@@ -12,6 +11,8 @@
 #include <assimp/postprocess.h>
 #include <stb_image.h>
 #include <memory>
+
+#include <glog/logging.h>
 
 namespace csugl::ml {
 
@@ -22,14 +23,14 @@ namespace csugl::ml {
     bool model_loader::pre_load(const std::string &fileName, const std::string &modelName) {
         auto realModelName = modelName.empty() ? fs::get_file_name(fileName) : modelName;
         if (model_names.find(modelName) != model_names.end()) {
-            csugl::Log::Warn("Model '{0}' existed at '{1}'", modelName, model_names[modelName]);
+            LOG(WARNING) << "Model '" << modelName << "' existed at '" << model_names[modelName] << "'";
             return true;
         }
-        auto models_am = SGT_Ref_Str_AM(Model);
+        auto models_am = SGT_Ref_Str_AM(MModel);
         auto oldModel = models_am->get(fileName);
         // model exist
         if (oldModel) {
-            csugl::Log::Warn("Model existed at '{0}', add model name '{1}'", fileName, realModelName);
+            LOG(WARNING) << "Model existed at '" << fileName << "', add model name '" << realModelName << "'";
             // add [model_name, file_name]
             model_names.try_emplace(realModelName, fileName);
             return true;
@@ -43,17 +44,17 @@ namespace csugl::ml {
                                        aiProcess_SortByPType);
 
         if (!scene) {
-            csugl::Log::Error("Assimp: file '{0}' error info: {1}", fileName, importer.GetErrorString());
+            LOG(ERROR) << "Assimp: file '" << fileName << "' error info: " << importer.GetErrorString();
             return false;
         }
 
         if (!scene->HasMeshes()) {
-            csugl::Log::Error("Assimp: there is no mesh in {0}", fileName);
+            LOG(ERROR) << "Assimp: there is no mesh in " << fileName;
             return false;
         }
 
         // Init mesh
-        auto newModel = MakeRef<Model>();
+        auto newModel = MakeRef<MModel>();
         newModel->path = fileName;
 
         for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
@@ -62,7 +63,7 @@ namespace csugl::ml {
         }
 
         if (newModel->meshes.empty()) {
-            csugl::Log::Error("Assimp: Model '{0}' at '{1}' load failed with empty mesh", realModelName, fileName);
+            LOG(ERROR) << "Assimp: Model '" << realModelName << "' at '" << fileName << "' load failed with empty mesh";
             return false;
         }
         models_am->add(fileName, newModel);
@@ -70,51 +71,62 @@ namespace csugl::ml {
         return true;
     }
 
-    Ref<Model> model_loader::load(const std::string &modelName) {
+    Ref<MModel> model_loader::load(const std::string &modelName) {
         if (model_names.find(modelName) != model_names.end()) {
-            return SGT_Ref_Str_AM(Model)->get(model_names[modelName]);
+            return SGT_Ref_Str_AM(MModel)->get(model_names[modelName]);
         }
         return nullptr;
     }
 
-    void model_loader::InitMesh(const aiMesh *cur_mesh, const aiScene *scene, Model &newModel) {
-        auto newMesh = MakeRef<Mesh>();
+    void model_loader::InitMesh(const aiMesh *cur_mesh, const aiScene *scene, MModel &newModel) {
+        auto newMesh = MakeRef<MMesh>();
         if (!cur_mesh->HasPositions() || !cur_mesh->HasNormals()) {
-            csugl::Log::Error("Assimp: no vertices or normal info in mesh '{0}'", std::string(cur_mesh->mName.data, cur_mesh->mName.length));
+            LOG(ERROR) << "Assimp: no vertices or normal info in mesh '" << std::string(cur_mesh->mName.data, cur_mesh->mName.length) << "'";
             return;
         }
         newMesh->name = std::string(cur_mesh->mName.data, cur_mesh->mName.length);
         newMesh->vertex_num = cur_mesh->mNumVertices;
-        newMesh->vertices = MakeScope<MVec3[]>(cur_mesh->mNumVertices);
-        newMesh->normals = MakeScope<MVec3[]>(cur_mesh->mNumVertices);
-        newMesh->tangents = MakeScope<MVec3[]>(cur_mesh->mNumVertices);
-        newMesh->biTangents = MakeScope<MVec3[]>(cur_mesh->mNumVertices);
-        newMesh->uvs = MakeScope<MVec2[]>(cur_mesh->mNumVertices);
+        newMesh->vertices = MakeScope<float[]>(cur_mesh->mNumVertices * 3);
+        newMesh->normals = MakeScope<float []>(cur_mesh->mNumVertices * 3);
+        newMesh->tangents = MakeScope<float[]>(cur_mesh->mNumVertices * 3);
+        newMesh->biTangents = MakeScope<float[]>(cur_mesh->mNumVertices * 3);
+        newMesh->uvs = MakeScope<float[]>(cur_mesh->mNumVertices * 2);
 
-#define GET_POS_NOR_TAN_BTAN(i) newMesh->vertices[i] = {cur_mesh->mVertices[i].x, cur_mesh->mVertices[i].y, cur_mesh->mVertices[i].z}; \
-                newMesh->normals[i] = {cur_mesh->mNormals[i].x, cur_mesh->mNormals[i].y, cur_mesh->mNormals[i].z}; \
-                newMesh->tangents[i] = {cur_mesh->mTangents[i].x, cur_mesh->mTangents[i].y, cur_mesh->mTangents[i].z}; \
-                newMesh->biTangents[i] = {cur_mesh->mBitangents[i].x, cur_mesh->mBitangents[i].y, cur_mesh->mBitangents[i].z};
+#define GET_POS_NOR_TAN_BTAN(i) newMesh->vertices[3 * i]  = cur_mesh->mVertices[i].x; \
+                                newMesh->vertices[3 * i + 1] = cur_mesh->mVertices[i].y; \
+                                newMesh->vertices[3 * i + 2] = cur_mesh->mVertices[i].z; \
+                                newMesh->normals[3 * i] = cur_mesh->mNormals[i].x;\
+                                newMesh->normals[3 * i + 1] = cur_mesh->mNormals[i].y;\
+                                newMesh->normals[3 * i + 2] = cur_mesh->mNormals[i].z; \
+                                newMesh->tangents[3 * i] = cur_mesh->mTangents[i].x;\
+                                newMesh->tangents[3 * i + 1] = cur_mesh->mTangents[i].y;\
+                                newMesh->tangents[3 * i + 2] = cur_mesh->mTangents[i].z; \
+                                newMesh->biTangents[3 * i] = cur_mesh->mBitangents[i].x;\
+                                newMesh->biTangents[3 * i + 1] = cur_mesh->mBitangents[i].y;\
+                                newMesh->biTangents[3 * i + 2] = cur_mesh->mBitangents[i].z;
 
         if (cur_mesh->HasTextureCoords(0)) {
             for (unsigned int i = 0; i < cur_mesh->mNumVertices; i++) {
                 GET_POS_NOR_TAN_BTAN(i)
-                newMesh->uvs[i] = {cur_mesh->mTextureCoords[0][i].x, cur_mesh->mTextureCoords[0][i].y};
+                newMesh->uvs[2 * i] = cur_mesh->mTextureCoords[0][i].x;
+                newMesh->uvs[2 * i + 1] = cur_mesh->mTextureCoords[0][i].y;
             }
         } else {
-            csugl::Log::Warn("Assimp: no vertices or normal info in mesh '{0}'", cur_mesh->mName.C_Str());
+            LOG(WARNING) << "Assimp: no vertices or normal info in mesh '" << cur_mesh->mName.C_Str() << "'";
             for (unsigned int i = 0; i < cur_mesh->mNumVertices; i++) {
                 GET_POS_NOR_TAN_BTAN(i)
-                newMesh->uvs[i] = {0.0f, 0.0f};
+                newMesh->uvs[2 * i] = 0.0f;
+                newMesh->uvs[2 * i + 1] = 0.0f;
             }
         }
 #undef GET_POS_NOR_TAN_BTAN
 
         // load face indices
         newMesh->indices = MakeScope<unsigned int[]>(cur_mesh->mNumFaces * 3);
+        newMesh->indices_num = cur_mesh->mNumFaces;
         for (unsigned int i = 0; i < cur_mesh->mNumFaces; i++) {
             const auto &face = cur_mesh->mFaces[i];
-            Log::Assert(face.mNumIndices == 3, "mesh '{0}' face indices is {1}", face.mNumIndices);
+            CHECK(face.mNumIndices == 3) << "mesh '" << newMesh->name << "' face indices is " << face.mNumIndices;
             newMesh->indices[i * 3] = face.mIndices[0];
             newMesh->indices[i * 3 + 1] = face.mIndices[1];
             newMesh->indices[i * 3 + 2] = face.mIndices[2];
@@ -126,9 +138,9 @@ namespace csugl::ml {
         newModel.meshes.push_back(newMesh);
     }
 
-    void model_loader::InitTexture(const aiMaterial *cur_mat, Mesh &newMesh, const Model &newModel) {
+    void model_loader::InitTexture(const aiMaterial *cur_mat, MMesh &newMesh, const MModel &newModel) {
         if (!cur_mat) {
-            csugl::Log::Warn("Assimp: no material");
+            LOG(WARNING) << "Assimp: no material";
             return;
         }
         auto dir = fs::get_file_path(newModel.path);
@@ -139,9 +151,13 @@ namespace csugl::ml {
     }
 
     void model_loader::GetTexture(const aiMaterial *cur_mat, unsigned int type,
-                                  Mesh &newMesh, const std::string &dir) {
+                                  MMesh &newMesh, const std::string &dir) {
         auto tex_am = SGT_Ref_Str_AM(MTexture);
         aiString path;
+        // TODO: Add MMaterial class
+        // aiColor3D keyColor;
+        // cur_mat->Get(AI_MATKEY_COLOR_AMBIENT, keyColor);
+
         for (unsigned int i = 0; i < cur_mat->GetTextureCount(static_cast<aiTextureType>(type)); i++) {
             if (cur_mat->GetTexture(static_cast<aiTextureType>(type), i, &path) == AI_SUCCESS) {
                 std::string tex_file = dir + "/" + path.C_Str();
@@ -170,7 +186,7 @@ namespace csugl::ml {
                                                &newTexture->channel,
                                                0);
                     if (!meta_data) {
-                        csugl::Log::Error("Assimp: stbi: Texture load failed at '{0}'", tex_file);
+                        LOG(ERROR) << "Assimp: stbi: Texture load failed at '" << tex_file << "'";
                         continue;
                     }
                     newTexture->data = Scope<unsigned char, decltype(MTexture::data_deleter)>(

@@ -18,39 +18,39 @@ struct aiMaterial;
 
 namespace csugl::ml {
 
-    struct MVec3 {
-    public:
-        union {
-            float _v[3];
-            struct {
-                float x, y, z;
-            };
-        };
+    // struct MVec3 {
+    // public:
+    //     union {
+    //         float _v[3];
+    //         struct {
+    //             float x, y, z;
+    //         };
+    //     };
 
-        MVec3() = default;
+    //     MVec3() = default;
 
-        MVec3(float x, float y, float z) : x(x), y(y), z(z) {}
+    //     MVec3(float x, float y, float z) : x(x), y(y), z(z) {}
 
-        inline float operator[](int i) { return _v[i]; }
-    };
+    //     inline float operator[](int i) { return _v[i]; }
+    // };
 
-    struct MVec2 {
-        union {
-            float _v[2];
-            struct {
-                float x, y;
-            };
-            struct {
-                float u, v;
-            };
-        };
+    // struct MVec2 {
+    //     union {
+    //         float _v[2];
+    //         struct {
+    //             float x, y;
+    //         };
+    //         struct {
+    //             float u, v;
+    //         };
+    //     };
 
-        MVec2() = default;
+    //     MVec2() = default;
 
-        MVec2(float x, float y) : x(x), y(y) {}
+    //     MVec2(float x, float y) : x(x), y(y) {}
 
-        inline float operator[](int i) { return _v[i]; }
-    };
+    //     inline float operator[](int i) { return _v[i]; }
+    // };
 
     enum class MTextureType {
         DIFFUSE,
@@ -69,21 +69,23 @@ namespace csugl::ml {
         Scope<unsigned char, decltype(data_deleter)> data;
     };
 
-    struct Mesh {
-        Scope<MVec3[]> vertices;
-        Scope<MVec3[]> normals;
-        Scope<MVec2[]> uvs;
-        Scope<MVec3[]> tangents;
-        Scope<MVec3[]> biTangents;
+    // Meta Mesh
+    struct MMesh {
+        Scope<float[]> vertices;    // vec3
+        Scope<float[]> normals;     // vec3
+        Scope<float[]> uvs;         // vec2
+        Scope<float[]> tangents;    // vec3
+        Scope<float[]> biTangents;  // vec3
         Scope<unsigned int[]> indices;
         unsigned int vertex_num;
+        unsigned int indices_num;
         std::string name;
         std::vector<Ref<MTexture>> textures;
     };
 
-    struct Model {
+    struct MModel {
         std::string path;
-        std::vector<Ref<Mesh>> meshes;
+        std::vector<Ref<MMesh>> meshes;
     };
 
     class model_loader {
@@ -102,17 +104,17 @@ namespace csugl::ml {
          * @param modelName
          * @return
          */
-        Ref<Model> load(const std::string &modelName);
+        Ref<MModel> load(const std::string &modelName);
 
     private:
         // [model_name, file_name]
         std::unordered_map<std::string, std::string > model_names;
 
-        void InitMesh(const aiMesh *cur_mesh, const aiScene *scene, Model &newModel);
+        void InitMesh(const aiMesh *cur_mesh, const aiScene *scene, MModel &newModel);
 
-        void InitTexture(const aiMaterial *cur_mat, Mesh &newMesh, const Model &newModel);
+        void InitTexture(const aiMaterial *cur_mat, MMesh &newMesh, const MModel &newModel);
 
-        void GetTexture(const aiMaterial *cur_mat, unsigned int type, Mesh &newMesh, const std::string &dir);
+        void GetTexture(const aiMaterial *cur_mat, unsigned int type, MMesh &newMesh, const std::string &dir);
 
     };
 

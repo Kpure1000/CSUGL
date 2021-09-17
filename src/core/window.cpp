@@ -2,10 +2,13 @@
 // Created by ktsq on 2021/6/19.
 //
 
+#include <core/core.h>
+#include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "log.h"
+#include <glog/logging.h>
+
 #include "event.h"
 #include "window.h"
 
@@ -17,9 +20,9 @@ namespace csugl {
             : m_Data(MakeRef<WindowData>(props)) {
         if (m_GLFWWindowCount == 0) {
             int success = glfwInit();
-            Log::AssertCore(success, "Could not initialize GLFW!");
+            CHECK(success) << "Could not initialize GLFW!";
             glfwSetErrorCallback([](int erCode, const char *description) {
-                Log::ErrorCore("GLFW Error ({0}): {1}", erCode, description);
+                 LOG(ERROR) << "GLFW Error (" << erCode << "): " << description; 
             });
 
             glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -58,15 +61,15 @@ namespace csugl {
         }
 
         if (nullptr == m_Window) {
-            Log::AssertCore(!m_Window, "Failed to create GLFW window");
+            CHECK(m_Window) << "Failed to create GLFW window";
             glfwTerminate();
         } else {
 
             glfwMakeContextCurrent(m_Window);
-            Log::AssertCore((0 != gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)), "Failed to initialize GLAD");
+            CHECK(0 != gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) << "Failed to initialize GLAD";
 
-            Log::InfoCore("\n>>>OpenGL Info>>>\n>Version:\t{0}\n>Vendor:\t{1}\n>Renderer:\t{2}\n>>>>>>>>>>>>>>>>>",
-                          glGetString(GL_VERSION), glGetString(GL_VENDOR), glGetString(GL_RENDERER));
+            LOG(INFO) << "\n>>>OpenGL Info>>>\n>Version:\t" << glGetString(GL_VERSION)
+                      << "\n>Vendor:\t" << glGetString(GL_VENDOR) << "\n>Renderer:\t" << glGetString(GL_RENDERER) << "\n>>>>>>>>>>>>>>>>>";
 
             // Set GLFW callbacks
             glfwSetWindowSizeCallback(m_Window, [](GLFWwindow *window, int width, int height) {

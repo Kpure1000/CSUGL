@@ -21,6 +21,8 @@ namespace csugl {
 
         bool isOpen() const;
 
+        void close() { isRunning = false; }
+
     private:
         bool isRunning;
         Scope<Window> window;

@@ -37,12 +37,10 @@ include_directories(${GLAD_DIR}/include)
 set(GLM_DIR vendor/glm)
 include_directories(${GLM_DIR})
 
-# spdlog
-option(SPDLOG_BUILD_EXAMPLES OFF)
-option(SPDLOG_BUILD_TESTING OFF)
-set(SPDLOG_DIR vendor/spdlog)
-add_subdirectory(${SPDLOG_DIR})
-include_directories(${SPDLOG_DIR}/include)
+# glog
+add_subdirectory(vendor/glog)
+list(APPEND LIBS glog::glog)
+include_directories(vendor/glog/src)
 
 # stb
 add_subdirectory(vendor/stb)

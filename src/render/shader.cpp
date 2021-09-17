@@ -3,7 +3,7 @@
 //
 
 #include "shader.h"
-#include "../core/log.h"
+#include <core/core.h>
 
 #include <iostream>
 #include <fstream>
@@ -14,6 +14,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include <glog/logging.h>
 
 namespace csugl {
 
@@ -32,7 +34,8 @@ namespace csugl {
             shaderStr = vstream.str();
         }
         catch (std::ifstream::failure e) {
-            Log::ErrorCore("std::ifstream::failed: \n{0}", e.what());
+            LOG(ERROR) << "std::ifstream::failed: \n"
+                       << e.what();
         }
 
 #pragma endregion
@@ -98,8 +101,8 @@ namespace csugl {
         glGetShaderiv(vShader, GL_COMPILE_STATUS, &isCompileSuccessed);
         if (!isCompileSuccessed) {
             glGetShaderInfoLog(vShader, INFO_BUFFER_SIZE, NULL, infoLog);
-            Log::ErrorCore("Vertex shader compilation failed, in file:\'{0}\'. Details:\n{1}",
-                           filePath, infoLog);
+            LOG(ERROR) << "Vertex shader compilation failed, in file:\'" << filePath << "\'. Details:\n"
+                       << infoLog;
         }
 
 #pragma endregion
@@ -118,8 +121,8 @@ namespace csugl {
         glGetShaderiv(fShader, GL_COMPILE_STATUS, &isCompileSuccessed);
         if (!isCompileSuccessed) {
             glGetShaderInfoLog(fShader, INFO_BUFFER_SIZE, NULL, finfoLog);
-            Log::ErrorCore("Fragment shader compilation failed, in file:\'{0}\'. Details:\n{1}",
-                           filePath, finfoLog);
+            LOG(ERROR) << "Fragment shader compilation failed, in file:\'" << filePath << "\'. Details:\n"
+                       << finfoLog;
         }
 
 #pragma endregion
@@ -137,7 +140,7 @@ namespace csugl {
         glGetProgramiv(m_ID, GL_LINK_STATUS, &isCompileSuccessed);
         if (!isCompileSuccessed) {
             glGetProgramInfoLog(m_ID, INFO_BUFFER_SIZE, NULL, pinfoLog);
-            Log::ErrorCore("Shader program link failed. Details:\n{0}", pinfoLog);
+            LOG(ERROR) << "Shader program link failed. Details:\n" << pinfoLog;
         }
 
         //  release shaders
