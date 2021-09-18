@@ -154,9 +154,23 @@ namespace csugl::ml {
                                   MMesh &newMesh, const std::string &dir) {
         auto tex_am = SGT_Ref_Str_AM(MTexture);
         aiString path;
-        // TODO: Add MMaterial class
-        // aiColor3D keyColor;
-        // cur_mat->Get(AI_MATKEY_COLOR_AMBIENT, keyColor);
+        // new MMaterial
+        if(!newMesh.material)
+            newMesh.material = MakeRef<MMaterial>();
+
+        aiColor3D keyColor;
+        cur_mat->Get(AI_MATKEY_COLOR_AMBIENT, keyColor);
+        newMesh.material->Ka[0]=keyColor.r;
+        newMesh.material->Ka[1]=keyColor.g;
+        newMesh.material->Ka[2]=keyColor.b;
+        cur_mat->Get(AI_MATKEY_COLOR_DIFFUSE, keyColor);
+        newMesh.material->Kd[0]=keyColor.r;
+        newMesh.material->Kd[1]=keyColor.g;
+        newMesh.material->Kd[2]=keyColor.b;
+        cur_mat->Get(AI_MATKEY_COLOR_SPECULAR, keyColor);
+        newMesh.material->Ks[0]=keyColor.r;
+        newMesh.material->Ks[1]=keyColor.g;
+        newMesh.material->Ks[2]=keyColor.b;
 
         for (unsigned int i = 0; i < cur_mat->GetTextureCount(static_cast<aiTextureType>(type)); i++) {
             if (cur_mat->GetTexture(static_cast<aiTextureType>(type), i, &path) == AI_SUCCESS) {
@@ -164,22 +178,6 @@ namespace csugl::ml {
                 auto tex_it = tex_am->get(tex_file);
                 if (!tex_it) {
                     auto newTexture = MakeRef<MTexture>();
-                    switch (static_cast<aiTextureType>(type)) {
-                        case aiTextureType_DIFFUSE:
-                            newTexture->type = MTextureType::DIFFUSE;
-                            break;
-                        case aiTextureType_SPECULAR:
-                            newTexture->type = MTextureType::SPECULAR;
-                            break;
-                        case aiTextureType_AMBIENT:
-                            newTexture->type = MTextureType::AMBIENT;
-                            break;
-                        case aiTextureType_NORMALS:
-                            newTexture->type = MTextureType::NORMAL;
-                            break;
-                        default:
-                            break;
-                    }
                     auto meta_data = stbi_load(tex_file.c_str(),
                                                &newTexture->width,
                                                &newTexture->height,
@@ -193,9 +191,41 @@ namespace csugl::ml {
                             meta_data,
                             MTexture::data_deleter);
                     tex_am->add(tex_file, newTexture);
-                    newMesh.textures.push_back(newTexture);
+                    switch (static_cast<aiTextureType>(type)) {
+                        case aiTextureType_DIFFUSE:
+                            newTexture->type = MTextureType::DIFFUSE;
+                            newMesh.material->map_Kd = newTexture;
+                            break;
+                        case aiTextureType_SPECULAR:
+                            newTexture->type = MTextureType::SPECULAR;
+                            newMesh.material->map_Ks = newTexture;
+                            break;
+                        case aiTextureType_AMBIENT:
+                            newTexture->type = MTextureType::AMBIENT;
+                            newMesh.material->map_Ka = newTexture;
+                            break;
+                        case aiTextureType_NORMALS:
+                            newTexture->type = MTextureType::NORMAL;
+                            break;
+                        default:
+                            break;
+                    }
                 } else {
-                    newMesh.textures.push_back(tex_it);
+                    switch (tex_it->type) {
+                        case MTextureType::DIFFUSE:
+                            newMesh.material->map_Kd = tex_it;
+                            break;
+                        case MTextureType::SPECULAR:
+                            newMesh.material->map_Ks = tex_it;
+                            break;
+                        case MTextureType::AMBIENT:
+                            newMesh.material->map_Ka = tex_it;
+                            break;
+                        case MTextureType::NORMAL:
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
 

@@ -18,40 +18,6 @@ struct aiMaterial;
 
 namespace csugl::ml {
 
-    // struct MVec3 {
-    // public:
-    //     union {
-    //         float _v[3];
-    //         struct {
-    //             float x, y, z;
-    //         };
-    //     };
-
-    //     MVec3() = default;
-
-    //     MVec3(float x, float y, float z) : x(x), y(y), z(z) {}
-
-    //     inline float operator[](int i) { return _v[i]; }
-    // };
-
-    // struct MVec2 {
-    //     union {
-    //         float _v[2];
-    //         struct {
-    //             float x, y;
-    //         };
-    //         struct {
-    //             float u, v;
-    //         };
-    //     };
-
-    //     MVec2() = default;
-
-    //     MVec2(float x, float y) : x(x), y(y) {}
-
-    //     inline float operator[](int i) { return _v[i]; }
-    // };
-
     enum class MTextureType {
         DIFFUSE,
         SPECULAR,
@@ -69,6 +35,15 @@ namespace csugl::ml {
         Scope<unsigned char, decltype(data_deleter)> data;
     };
 
+    struct MMaterial {
+        float Ka[3];
+        float Kd[3];
+        float Ks[3];
+        Ref<MTexture> map_Ka;
+        Ref<MTexture> map_Kd;
+        Ref<MTexture> map_Ks;
+    };
+
     // Meta Mesh
     struct MMesh {
         Scope<float[]> vertices;    // vec3
@@ -80,7 +55,8 @@ namespace csugl::ml {
         unsigned int vertex_num;
         unsigned int indices_num;
         std::string name;
-        std::vector<Ref<MTexture>> textures;
+        // std::vector<Ref<MTexture>> textures;
+        Ref<MMaterial> material;
     };
 
     struct MModel {
