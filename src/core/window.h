@@ -68,6 +68,8 @@ namespace csugl {
     public:
         explicit Window(const WindowProps &props);
 
+        void Destroy();
+
         inline void addEventCallback(const EventCallbackFn &callback) {
             m_Data->eventCallBacks.push_back(callback);
         }
@@ -79,6 +81,8 @@ namespace csugl {
         void Display() const;
 
         void SetVSync(bool vsync);
+
+        void Resize(int width, int height);
 
         GLFWwindow *GetGLFWwindow() const { return m_Window; }
 

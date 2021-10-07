@@ -17,6 +17,8 @@ namespace csugl {
     public:
         explicit Application();
 
+        ~Application();
+
         Window &GetWindow() const;
 
         bool isOpen() const;

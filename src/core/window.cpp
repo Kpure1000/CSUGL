@@ -185,6 +185,10 @@ namespace csugl {
         SetVSync(m_Data->VSync);
     }
 
+    void Window::Destroy() {
+        glfwDestroyWindow(m_Window);
+    }
+
     void Window::Display() const {
         glfwSwapBuffers(m_Window);
         glfwPollEvents();
@@ -197,6 +201,10 @@ namespace csugl {
             glfwSwapInterval(0);
 
         m_Data->VSync = vsync;
+    }
+
+    void Window::Resize(int width, int height) {
+        glfwSetWindowSize(m_Window, width, height);
     }
 
     bool Window::isOpen() const {

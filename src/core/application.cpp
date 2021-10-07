@@ -35,6 +35,10 @@ namespace csugl {
         });
     }
 
+    Application::~Application() {
+        window->Destroy();
+    }
+
     Window &Application::GetWindow() const {
         return *window;
     }
