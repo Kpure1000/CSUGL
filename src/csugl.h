@@ -11,6 +11,8 @@
 
 #include "render/shader.h"
 #include "render/light.h"
+#include "render/buffer.h"
+#include "render/vertex_array.h"
 
 #include "utils/singleton.h"
 #include "utils/thread_pool.h"
