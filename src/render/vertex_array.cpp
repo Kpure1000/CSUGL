@@ -29,7 +29,7 @@ namespace csugl {
     }
 
     VertexArray::VertexArray() 
-        : vertex_buffers(MakeRef<std::vector<Ref<VertexBuffer>>>()) {
+        : vertex_buffers(MakeRef<std::vector<Ref<VertexBuffer>>>()), attri_count(0) {
         glGenVertexArrays(1, &id);
         glBindVertexArray(id);
     }
@@ -46,7 +46,7 @@ namespace csugl {
             if (ele.type == BufferElementType::Mat3 ||
                 ele.type == BufferElementType::Mat4) {
                 for (size_t i = 0; i < ele.count; i++) {
-                    glEnableVertexAttribArray(attri_count++);
+                    glEnableVertexAttribArray(attri_count); // 草！
                     glVertexAttribPointer(
                         attri_count,
                         ele.count,
@@ -54,9 +54,10 @@ namespace csugl {
                         ele.is_normalized,
                         layout.stride,
                         (const void *)ele.offset);
+                    attri_count++;
                 }
             } else {
-                glEnableVertexAttribArray(attri_count++);
+                glEnableVertexAttribArray(attri_count);
                 glVertexAttribPointer(
                     attri_count,
                     ele.count,
@@ -64,9 +65,10 @@ namespace csugl {
                     ele.is_normalized,
                     layout.stride,
                     (const void *)ele.offset);
+                attri_count++;
             }
         }
-        vertex_buffers->push_back(vb);
+        vertex_buffers->push_back(vb); // TODO: why need storage vb
     }
 
     std::vector<Ref<VertexBuffer>> VertexArray::GetVertexBuffers() const {

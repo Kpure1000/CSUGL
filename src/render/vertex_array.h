@@ -2,6 +2,8 @@
 #define CSUGL_VERTEX_ARRAY_H
 #include "../core/core.h"
 
+#include <vector>
+
 namespace csugl {
 
     struct BufferLayout;
