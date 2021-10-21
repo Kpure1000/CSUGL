@@ -32,7 +32,10 @@ namespace csugl {
     };
 
     struct BufferLayout {
-        BufferLayout(const std::initializer_list<BufferElement> &&ele_list);
+        BufferLayout(const std::initializer_list<BufferElement> &&ele_list,
+                     bool is_cross = true, size_t size = 0);
+        bool is_cross;
+        size_t size;
         std::vector<BufferElement> elements;
         size_t stride;
     };

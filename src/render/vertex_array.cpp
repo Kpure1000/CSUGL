@@ -42,29 +42,25 @@ namespace csugl {
         Bind();
         vb->Bind();
         vb->SetLayout(this, layout);
+        size_t offset = 0;
         for(const auto& ele : layout.elements) {
+            size_t lay_count = 1;
             if (ele.type == BufferElementType::Mat3 ||
                 ele.type == BufferElementType::Mat4) {
-                for (size_t i = 0; i < ele.count; i++) {
-                    glEnableVertexAttribArray(attri_count); // 草！
-                    glVertexAttribPointer(
-                        attri_count,
-                        ele.count,
-                        GetGlTypeOfBufferElement(ele.type),
-                        ele.is_normalized,
-                        layout.stride,
-                        (const void *)ele.offset);
-                    attri_count++;
-                }
-            } else {
-                glEnableVertexAttribArray(attri_count);
+                lay_count = ele.count;
+            }
+            for (size_t i = 0; i < lay_count; i++) {
+                glEnableVertexAttribArray(static_cast<GLuint>(attri_count)); // 草！
                 glVertexAttribPointer(
                     attri_count,
                     ele.count,
                     GetGlTypeOfBufferElement(ele.type),
                     ele.is_normalized,
-                    layout.stride,
-                    (const void *)ele.offset);
+                    layout.is_cross ? layout.stride : 0,
+                    layout.is_cross
+                        ? (const void *)ele.offset
+                        : (const void *)(offset));
+                offset += ele.size * layout.size;
                 attri_count++;
             }
         }

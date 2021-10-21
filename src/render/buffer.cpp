@@ -51,8 +51,9 @@ namespace csugl {
         }
     }
 
-    BufferLayout::BufferLayout(const std::initializer_list<BufferElement> && ele_list)
-        : elements(ele_list), stride(0) {
+    BufferLayout::BufferLayout(const std::initializer_list<BufferElement> &&ele_list,
+                               bool is_cross, size_t size)
+        : is_cross(is_cross), size(size), elements(ele_list), stride(0) {
         for (auto &ele : elements) {
             ele.offset = stride;
             stride += ele.size;

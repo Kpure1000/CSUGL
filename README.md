@@ -126,6 +126,10 @@ __TBC ...__
 
 __TBC ...__
 
+### 使用方法
+
+[Usage](https://gitee.com/Kpure1000/CSUGL/doc/USAGE.md)
+
 ### <b id="contribute">贡献 </b>
 
 基本要求：
