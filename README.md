@@ -128,7 +128,7 @@ __TBC ...__
 
 ### 使用方法
 
-[Usage](https://gitee.com/Kpure1000/CSUGL/doc/USAGE.md)
+[Usage](https://gitee.com/Kpure1000/CSUGL/blob/master/doc/USAGE.md)
 
 ### <b id="contribute">贡献 </b>
 
