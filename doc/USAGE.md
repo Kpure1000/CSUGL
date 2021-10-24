@@ -1,5 +1,7 @@
 # CSUGL Usage
 
+***Updating...***
+
 [TOC]
 
 ## Core Example
@@ -28,6 +30,10 @@ csugl::Scope<Object, decltype(deleter)> obj(new Object(...), deleter);
 
 ### Create Window
 
+```Application``` is in src/core/Application.h, ```Window``` is in src/core/window.h.
+
+```Window``` is depended on ```Application```, which is a singleton instance.
+
 ``` cpp
 // initialize the application and get instance
 csugl::Ref<csugl::Application> app = csugl::singleton<csugl::Application>::getInstance();
@@ -53,7 +59,9 @@ csugl::singleton<csugl::Application>::destroy();
 
 ### Add Event Callback
 
-Use lambda expression as callback
+```Event``` is in src/core/event.h.
+
+Use **lambda expression** as callback.
 
 ``` cpp
 window->addEventCallback([&](csugl::Event &ev) {
@@ -80,6 +88,8 @@ window->addEventCallback([&](csugl::Event &ev) {
 
 ### Get Input
 
+```Input``` is defined in src/core/input.h, with some static methods.
+
 ``` cpp
 // if button0 is being pressed
 if (csugl::Input::IsMouseButtonPressed(csugl::Mouse::Button0)) {
@@ -97,15 +107,44 @@ std::pair<int, int> mousePos = csugl::Input::GetMousePos();
 
 ### Create a Shader and use it
 
+Find ```Shader``` in src/render/shader.h.
+
 ``` cpp
 // load shader from file, of which name without space
 auto shader = csugl::MakeRef<csugl::Shader>("myshader.glsl");
 
 // use this shader program
 shader->Use();
+// set uniform varialbe value
 shader->SetVector3("_value", glm::vec3{1.0f, 1.0f, 1.0f});
 ```
 
-### Create Vertex Buffer
+### Render a Triangle (with Index Buffer)
+
+TODO
+
+## Utilities Example
+
+### Singleton
+
+Find ```singleton``` in src/utils/singleton.h
+
+```cpp
+// get the instance of Object with constructor parameters
+auto obj = csugl::singleton<Object>::getInstance(...);
+// ...
+// if you've gotten once, u don't need fill all parameters, any parameters will be ignored
+auto obj = csugl::singleton<Object>::getInstance();
+```
+
+### ThreadPool
+
+Find ```thread_pool``` in src/utils/thread_pool.h
+
+```cpp
+// TODO
+```
+
+### ModelLoader
 
 TODO

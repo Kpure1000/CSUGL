@@ -46,7 +46,7 @@ __ TBC ...__
 
 * C++17：使用了少量C++17特性
 * 基础封装：将GLFW的大部分功能进行封装，例如```Window```，```Event```，```Input```等
-* 渲染未封装：除了Shader外，大部分涉及OpenGL渲染的代码并未封装，供学习者灵活使用
+* 渲染小部分封装：封装了shader，三个基本的object (vao, vbo, ibo)
 * 内存自动管理：你将不几乎会在项目中用到delete，而是使用封装好的C++原生智能指针进行更加安全的内存管理。
 
 __ TBC ...__
@@ -65,7 +65,9 @@ __ TBC ...__
 		- camera: 相机系统
 	- render
 		- shader: 加载和使用shader
-		- light: 光照封装（TODO）
+		- light: 光照封装**（准备取消这个封装）**
+		- vertex_array: GL 的 Vertex Array 封装
+		- buffer: GL 的 Vertex Buffer 和 Index Buffer 封装
 	- utils
 		- singleton: 单例模板
 		- thread_pool: 简单的线程池
