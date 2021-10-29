@@ -37,25 +37,41 @@ add_subdirectory(vendor/imgui)
 list(APPEND LIBS imgui)
 include_directories(vendor/imgui)
 
-# assimp
-option(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
-option(ASSIMP_BUILD_SAMPLES OFF)
-option(ASSIMP_BUILD_TESTS OFF)
-OPTION(ASSIMP_BUILD_ZLIB "" ON)
-add_subdirectory(vendor/assimp)
-list(APPEND LIBS assimp)
-include_directories(vendor/assimp/include)
+option(CSUGL_BUILD_MODEL_LOADER OFF)
+
+if(CSUGL_BUILD_MODEL_LOADER)
+    # assimp
+    message("Assimp is On")
+    option(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
+    option(ASSIMP_BUILD_SAMPLES OFF)
+    option(ASSIMP_BUILD_TESTS OFF)
+    OPTION(ASSIMP_BUILD_ZLIB "" ON)
+    add_subdirectory(vendor/assimp)
+    list(APPEND LIBS assimp)
+    include_directories(vendor/assimp/include)
+endif()
 
 # CSUGL
-file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
-file(GLOB_RECURSE HEADER_FILES src/*.h)
+file(GLOB_RECURSE SOURCE_FILES_CORE src/core/*.cpp)
+file(GLOB_RECURSE SOURCE_FILES_RENDER src/render/*.cpp)
+list(APPEND SOURCE_FILES ${SOURCE_FILES_CORE} ${SOURCE_FILES_RENDER})
+if(CSUGL_BUILD_MODEL_LOADER)
+    list(APPEND SOURCE_FILES src/utils/model_loader.cpp)
+endif()
+
+file(GLOB_RECURSE HEADER_FILES_CORE src/core/*.h)
+file(GLOB_RECURSE HEADER_FILES_RENDER src/render/*.h)
+list(APPEND HEADER_FILES ${HEADER_FILES_CORE} ${HEADER_FILES_RENDER})
+list(APPEND HEADER_FILES src/utils/asset_manager.h src/utils/singleton.h src/utils/thread_pool.h)
+if(CSUGL_BUILD_MODEL_LOADER)
+    list(APPEND HEADER_FILES src/utils/model_loader.h)
+endif()
+
 file(GLOB VENDOR_FILES ${GLAD_SRC})
-# file(GLOB_RECURSE SHADER_FILES assets/shader/*.glsl)
 
 source_group("Sources" FILES ${SOURCE_FILES})
 source_group("Headers" FILES ${HEADER_FILES})
 source_group("Vendors" FILES ${VENDOR_FILES})
-# source_group("Shaders" FILES ${SHADER_FILES})
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     message("Use MSVC")
